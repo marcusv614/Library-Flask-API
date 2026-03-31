@@ -33,5 +33,12 @@ def get_books():
     books = Book.query.all()
     return jsonify([book.as_dict() for book in books]), 200
 
+@app.route('/books/<uuid:book_id>', methods=['GET'])
+def get_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return jsonify({'error': 'Livro não encontrado'}), 404
+    return jsonify(book.as_dict()), 200
+
 if __name__ == "__main__":
     app.run(debug=True,port=8080,host="0.0.0.0")
