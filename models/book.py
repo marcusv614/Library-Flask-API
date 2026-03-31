@@ -1,12 +1,13 @@
-from sqlalchemy.dialects.postgresql import UUID,TEXT
-from sqlalchemy import func
+import uuid
+
+from sqlalchemy.dialects.postgresql import UUID, TEXT
 from db import db
 
 class Book(db.Model):
     __tablename__ = "book"
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=func.uuid_generate_v4())
-    title = db.Column(db.String(255),nullable=False)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255),nullable=False)
     description = db.Column(TEXT(),nullable=False)
     isFavorite = db.Column(db.Boolean,default=False)
