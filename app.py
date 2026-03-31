@@ -13,11 +13,20 @@ migrate = Migrate(app,db)
 
 @app.route("/books",methods=['POST'])
 def add_book():
-    data = request.get_json()
-    newbook = Book(title=data['title'],author=data['author'],description=data['description']) # type: ignore
+    data = request.get_json(silent=True)
+    if not data or not all(key in data for key in ('title', 'author', 'description')):
+        return jsonify({
+            'error': 'Envie JSON válido com title, author e description.'
+        }), 400
+
+    newbook = Book(
+        title=data['title'],
+        author=data['author'],
+        description=data['description']
+    )
     db.session.add(newbook)
     db.session.commit()
-    return jsonify({'message: livro inserido com sucesso' }), 201
+    return jsonify({'message': 'Livro inserido com sucesso'}), 201
 
 if __name__ == "__main__":
     app.run(debug=True,port=8080,host="0.0.0.0")
