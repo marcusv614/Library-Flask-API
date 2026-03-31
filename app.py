@@ -40,5 +40,41 @@ def get_book(book_id):
         return jsonify({'error': 'Livro não encontrado'}), 404
     return jsonify(book.as_dict()), 200
 
+@app.route('/books/<uuid:book_id>', methods=['PUT'])
+def update_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return jsonify({'error': 'Livro não encontrado'}), 404
+
+    data = request.get_json(silent=True)
+    if not data or not any(key in data for key in ('title', 'author', 'description', 'isFavorite', 'isReading', 'isFinished')):
+        return jsonify({'error': 'Envie JSON válido com pelo menos um campo para atualizar.'}), 400
+
+    if 'title' in data:
+        book.title = data['title']
+    if 'author' in data:
+        book.author = data['author']
+    if 'description' in data:
+        book.description = data['description']
+    if 'isFavorite' in data:
+        book.isFavorite = bool(data['isFavorite'])
+    if 'isReading' in data:
+        book.isReading = bool(data['isReading'])
+    if 'isFinished' in data:
+        book.isFinished = bool(data['isFinished'])
+
+    db.session.commit()
+    return jsonify({'message': 'Livro atualizado com sucesso', 'book': book.as_dict()}), 200
+
+@app.route('/books/<uuid:book_id>', methods=['DELETE'])
+def delete_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return jsonify({'error': 'Livro não encontrado'}), 404
+
+    db.session.delete(book)
+    db.session.commit()
+    return jsonify({'message': 'Livro removido com sucesso'}), 200
+
 if __name__ == "__main__":
     app.run(debug=True,port=8080,host="0.0.0.0")
